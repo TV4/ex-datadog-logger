@@ -10,7 +10,7 @@ by adding `ex_datadog_logger` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:ex_datadog_logger, "~> 0.1.0"}
+    {:ex_datadog_logger, github: "TV4/ex-datadog-logger"}
   ]
 end
 ```

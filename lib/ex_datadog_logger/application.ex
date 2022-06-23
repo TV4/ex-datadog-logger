@@ -10,6 +10,7 @@ defmodule ExDatadogLogger.Application do
     children = [
       # Starts a worker by calling: ExDatadogLogger.Worker.start_link(arg)
       # {ExDatadogLogger.Worker, arg}
+      ExDatadogLogger.DatadogLoggerManager
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

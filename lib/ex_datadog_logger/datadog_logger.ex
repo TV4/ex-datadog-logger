@@ -28,12 +28,7 @@ defmodule ExDatadogLogger.DatadogLogger do
 
   def phoenix_endpoint_stop(_, %{duration: duration}, %{conn: conn} = _metadata, _) do
     %{status: status} = conn
-    servicename = servicename()
-    Logger.info("METRIC_DD #{servicename}.status.#{status}:1|c")
-    Logger.info("METRIC_DD #{servicename}.response-time:#{duration(duration)}|ms")
-  end
-
-  defp servicename() do
-    Application.get_env(:ex_datadog_logger, :servicename)
+    ExDatadogLogger.put_counter("status.#{status}")
+    ExDatadogLogger.put_timer("response-time", duration(duration))
   end
 end

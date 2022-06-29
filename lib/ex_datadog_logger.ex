@@ -1,18 +1,27 @@
 defmodule ExDatadogLogger do
-  @moduledoc """
-  Documentation for `ExDatadogLogger`.
-  """
+  require Logger
 
-  @doc """
-  Hello world.
+  def put_counter(metric_name, tags \\ []) do
+    Logger.info("METRIC_DD #{servicename()}.#{metric_name}:1|c" <> tags(tags))
+  end
 
-  ## Examples
+  def put_timer(metric_name, ms, tags \\ []) do
+    Logger.info("METRIC_DD #{servicename()}.#{metric_name}:#{ms}|ms" <> tags(tags))
+  end
 
-      iex> ExDatadogLogger.hello()
-      :world
+  defp tags([]), do: ""
 
-  """
-  def hello do
-    :world
+  defp tags(tags) do
+    Enum.reduce(tags, "|#", fn
+      {k, v}, acc ->
+        acc <> "#{k}:#{v},"
+
+      v, acc ->
+        acc <> "#{v},"
+    end)
+  end
+
+  defp servicename() do
+    Application.get_env(:ex_datadog_logger, :servicename)
   end
 end

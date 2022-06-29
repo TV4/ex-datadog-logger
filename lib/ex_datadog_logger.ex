@@ -12,13 +12,15 @@ defmodule ExDatadogLogger do
   defp tags([]), do: ""
 
   defp tags(tags) do
-    Enum.reduce(tags, "|#", fn
+    tags
+    |> Enum.reduce("|#", fn
       {k, v}, acc ->
         acc <> "#{k}:#{v},"
 
       v, acc ->
         acc <> "#{v},"
     end)
+    |> String.trim_trailing(",")
   end
 
   defp servicename() do

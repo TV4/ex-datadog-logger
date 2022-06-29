@@ -11,7 +11,7 @@ defmodule ExDatadogLoggerTest do
     test "with tags" do
       assert capture_log(fn ->
                ExDatadogLogger.put_counter("metric", [{"key", "value"}, :success])
-             end) =~ "METRIC_DD testservice.metric:1|c|#key:value,success"
+             end) =~ "METRIC_DD testservice.metric:1|c|#key:value,success\n"
     end
 
     test "without tags" do
@@ -31,7 +31,7 @@ defmodule ExDatadogLoggerTest do
     test "with tags" do
       assert capture_log(fn ->
                ExDatadogLogger.put_timer("response-time", 5000, [{"key", "value"}, :success])
-             end) =~ "METRIC_DD testservice.response-time:5000|ms|#key:value,success"
+             end) =~ "METRIC_DD testservice.response-time:5000|ms|#key:value,success\n"
     end
   end
 end

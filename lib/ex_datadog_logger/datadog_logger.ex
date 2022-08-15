@@ -27,10 +27,19 @@ defmodule ExDatadogLogger.DatadogLogger do
   end
 
   def phoenix_endpoint_stop(_events, %{duration: duration}, %{conn: conn} = _metadata, _) do
-    ExDatadogLogger.put_counter("http", [
+
+    tags = [
       {:request_endpoint, conn.request_path},
       {:response_status_code, conn.status}
-    ])
+    ]
+
+    tags =
+      case Enum.filter(conn.req_headers, fn {header, value} -> header == "client" end) do
+        [{"client", client_name}] -> tags ++ [{:client, client_name}]
+        [] -> tags
+      end
+
+    ExDatadogLogger.put_counter("http", tags)
 
     ExDatadogLogger.put_timer("response-time", duration(duration))
   end

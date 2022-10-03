@@ -27,27 +27,32 @@ defmodule ExDatadogLogger.DatadogLogger do
   end
 
   def phoenix_endpoint_stop(_events, %{duration: duration}, %{conn: conn} = _metadata, _) do
-    {"user-agent", user_agent_arg} =
-      Enum.find(conn.req_headers, fn {key, _val} -> key == "user-agent" end)
+    {"user-agent", user_agent} =
+      case Enum.find(conn.req_headers, fn {key, _val} -> key == "user-agent" end) do
+        {"user-agent", user_agent} -> {"user-agent", user_agent}
+        nil -> {"user-agent", nil}
+      end
 
-    case String.contains?(user_agent_arg, "Detectify") do
-      false ->
-        tags = [
-          {:request_endpoint, conn.request_path},
-          {:response_status_code, conn.status}
-        ]
+    with true <- conn.request_path not in ignored_endpoints(),
+         false <- String.contains?(user_agent, "Detectify") do
+      tags = [
+        {:request_endpoint, conn.request_path},
+        {:response_status_code, conn.status}
+      ]
 
-        tags =
-          case Enum.filter(conn.req_headers, fn {header, _value} -> header == "client" end) do
-            [{"client", client_name}] -> tags ++ [{:client, client_name}]
-            [] -> tags
-          end
+      tags =
+        case Enum.filter(conn.req_headers, fn {header, _value} -> header == "client" end) do
+          [{"client", client_name}] -> tags ++ [{:client, client_name}]
+          [] -> tags
+        end
 
-        ExDatadogLogger.put_counter("http", tags)
-        ExDatadogLogger.put_timer("response-time", duration(duration))
-
-      true ->
+      ExDatadogLogger.put_counter("http", tags)
+      ExDatadogLogger.put_timer("response-time", duration(duration))
+    else
+      _ ->
         ExDatadogLogger.put_timer("response-time", duration(duration))
     end
   end
+
+  defp ignored_endpoints(), do: Application.get_env(:ex_datadog_logger, :ignore_endpoints, [])
 end

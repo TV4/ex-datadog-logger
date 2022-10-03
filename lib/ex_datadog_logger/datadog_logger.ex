@@ -27,10 +27,14 @@ defmodule ExDatadogLogger.DatadogLogger do
   end
 
   def phoenix_endpoint_stop(_events, %{duration: duration}, %{conn: conn} = _metadata, _) do
-    ExDatadogLogger.put_counter("http", [
-      {:request_endpoint, conn.request_path},
-      {:response_status_code, conn.status}
-    ])
+    whitelist = ["/verify_user", "/update_db"]
+
+    if conn.request_path in whitelist do
+      ExDatadogLogger.put_counter("http", [
+        {:request_endpoint, conn.request_path},
+        {:response_status_code, conn.status}
+      ])
+    end
 
     ExDatadogLogger.put_timer("response-time", duration(duration))
   end

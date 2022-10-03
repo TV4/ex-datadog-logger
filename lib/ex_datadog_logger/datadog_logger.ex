@@ -28,7 +28,6 @@ defmodule ExDatadogLogger.DatadogLogger do
 
   def phoenix_endpoint_stop(_events, %{duration: duration}, %{conn: conn} = _metadata, _) do
     ExDatadogLogger.put_counter("http", [
-      {:request_endpoint, conn.request_path},
       {:response_status_code, conn.status}
     ])
 

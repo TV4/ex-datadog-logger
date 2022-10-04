@@ -37,7 +37,8 @@ defmodule ExDatadogLogger.DatadogLogger do
          false <- String.contains?(user_agent, "Detectify") do
       tags = [
         {:request_endpoint, conn.request_path},
-        {:response_status_code, conn.status}
+        {:response_status_code, conn.status},
+        {:user_agent, user_agent}
       ]
 
       tags =

@@ -27,10 +27,10 @@ defmodule ExDatadogLogger.DatadogLogger do
   end
 
   def phoenix_endpoint_stop(_events, %{duration: duration}, %{conn: conn} = _metadata, _) do
-    {"user-agent", user_agent} =
+    user_agent =
       case Enum.find(conn.req_headers, fn {key, _val} -> key == "user-agent" end) do
-        {"user-agent", user_agent} -> {"user-agent", user_agent}
-        nil -> {"user-agent", nil}
+        {"user-agent", user_agent} -> user_agent
+        nil -> ""
       end
 
     with true <- conn.request_path not in ignored_endpoints(),

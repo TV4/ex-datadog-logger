@@ -30,22 +30,23 @@ defmodule ExDatadogLogger.DatadogLogger do
     {"user-agent", user_agent_arg} =
       Enum.find(conn.req_headers, fn {key, _val} -> key == "user-agent" end)
 
-    case String.contains?(user_agent_arg, "Detectify") do
-      false ->
-        tags = [
-          {:request_endpoint, conn.request_path},
-          {:response_status_code, conn.status}
-        ]
+    blacklisted? = conn.request_path in ["/health"]
 
-        tags =
-          case Enum.filter(conn.req_headers, fn {header, _value} -> header == "client" end) do
-            [{"client", client_name}] -> tags ++ [{:client, client_name}]
-            [] -> tags
-          end
+    with false <- String.contains?(user_agent_arg, "Detectify"), false <- blacklisted? do
+      tags = [
+        {:request_endpoint, conn.request_path},
+        {:response_status_code, conn.status}
+      ]
 
-        ExDatadogLogger.put_counter("http", tags)
-        ExDatadogLogger.put_timer("response-time", duration(duration))
+      tags =
+        case Enum.filter(conn.req_headers, fn {header, _value} -> header == "client" end) do
+          [{"client", client_name}] -> tags ++ [{:client, client_name}]
+          [] -> tags
+        end
 
+      ExDatadogLogger.put_counter("http", tags)
+      ExDatadogLogger.put_timer("response-time", duration(duration))
+    else
       true ->
         ExDatadogLogger.put_timer("response-time", duration(duration))
     end

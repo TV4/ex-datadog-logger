@@ -48,10 +48,6 @@ defmodule ExDatadogLogger.DatadogLogger do
   end
 
   defp whitelist() do
-    Application.get_env(:ex_datadog_logger, :router, [])
-    |> Enum.flat_map(fn
-      %{path: "/health"} -> []
-      %{path: path} -> path
-    end)
+    Application.get_env(:ex_datadog_logger, :whitelist, [])
   end
 end

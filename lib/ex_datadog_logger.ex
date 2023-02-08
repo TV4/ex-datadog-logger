@@ -5,6 +5,10 @@ defmodule ExDatadogLogger do
     Logger.info("METRIC_DD #{servicename()}.#{metric_name}:1|c" <> tags(tags))
   end
 
+  def put_counters(metric_name, counter, tags \\ []) do
+    Logger.info("METRIC_DD #{servicename()}.#{metric_name}:#{counter}|c" <> tags(tags))
+  end
+
   def put_timer(metric_name, ms, tags \\ []) do
     Logger.info("METRIC_DD #{servicename()}.#{metric_name}:#{ms}|ms" <> tags(tags))
   end

@@ -21,6 +21,20 @@ defmodule ExDatadogLoggerTest do
     end
   end
 
+  describe "put_counters" do
+    test "with tags" do
+      assert capture_log(fn ->
+               ExDatadogLogger.put_counters("metric", 5, [{"key", "value"}, :success])
+             end) =~ "METRIC_DD testservice.metric:5|c|#key:value,success\n"
+    end
+
+    test "without tags" do
+      assert capture_log(fn ->
+               ExDatadogLogger.put_counters("metric", 5)
+             end) =~ "METRIC_DD testservice.metric:5|c"
+    end
+  end
+
   describe "put_timer" do
     test "without tags" do
       assert capture_log(fn ->
